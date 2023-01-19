@@ -1,0 +1,55 @@
+h1 {
+    font-weight: 300;
+    font-size: 64px;
+}
+.infoblock {
+    font-family: Roboto, sans-serif;
+    text-align: center;
+    margin: 2.5% auto;
+}
+.v-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+    margin: 2.5% 25%;
+}
+.infoblock p {
+    font-size: 24px;
+}
+.searchBar {
+    display: flex;
+    margin: 16px auto;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 10px;
+}
+.v-card--reveal {
+    align-items: center;
+    bottom: 0;
+    padding: 10px;
+    justify-content: center;
+    opacity: .9;
+    position: absolute;
+    width: 100%;
+}
+.v-footer {
+    padding: 0px;
+}
+.v-btn--variant-plain {
+    text-transform: none;
+    font-size: 1.5em;
+    letter-spacing: 0em;
+    opacity: 1;
+}
+.v-btn--disabled {
+    opacity: 1;
+}
+
+@media print {
+
+    .v-img {
+        height: 200px;
+    }
+  
+  }

@@ -1,0 +1,9 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'lessons/styles.css' %}">
+
+<div class="infoblock">
+<h1>{{ lesson.lesson_name }}</h1>
+<p>{{ lesson.lesson_desc }}</p>
+</div>
+<img src="/{{ lesson.image }}" alt="{{ lesson.lesson_desc }}">

@@ -1,0 +1,13 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'lessons/styles.css' %}">
+
+{% if lesson_list %}
+    <ul>
+    {% for lesson in lesson_list %}
+        <li><a href="{% url 'lessons:detail' lesson.id %}">{{ lesson.lesson_name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Уроки не найдены :(</p>
+{% endif %}
