@@ -11,7 +11,7 @@ class IndexView(generic.ListView):
     context_object_name = 'lesson_list'
 
     def get_queryset(self):
-        return Lesson.objects.order_by('-pub_date')[:5]
+        return Lesson.objects.order_by('-pub_date')
 
 
 class DetailView(generic.DetailView):
