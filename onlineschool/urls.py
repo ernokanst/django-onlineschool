@@ -17,30 +17,40 @@ from django.contrib import admin
 from django.urls import include, path
 from django.contrib.auth.models import User
 from lessons.models import Lesson
-from rest_framework import routers, serializers, viewsets
+from rest_framework import routers, serializers, viewsets, filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['url', 'username', 'email', 'is_staff']
+        fields = ['username', 'email', 'is_staff']
 class LessonSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Lesson
-        fields = ['url', 'lesson_name', 'lesson_desc', 'pub_date', 'image']
+        fields = ['lesson_name', 'lesson_desc', 'author', 'pub_date', 'image']
 
 # ViewSets define the view behavior.
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 class LessonViewSet(viewsets.ModelViewSet):
-    queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
+    filterset_fields = ['author']
+    search_fields = ['lesson_name', 'lesson_desc']
+    ordering_fields = ['lesson_name', 'pub_date']
+    def get_queryset(self):
+        queryset = Lesson.objects.all()
+        username = self.request.query_params.get('username')
+        if username is not None:
+            queryset = queryset.filter(author__username=username)
+        return queryset
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
-router.register(r'lessons', LessonViewSet)
+router.register(r'lessons', LessonViewSet, basename='lessons')
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
