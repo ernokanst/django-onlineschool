@@ -7,5 +7,9 @@
 <p>{{ lesson.lesson_desc }}</p>
 </div>
 {% if lesson.image %}
-<img src="/{{ lesson.image }}" alt="{{ lesson.lesson_desc }}">
+    {% if "static/lessons" in lesson.image_path %}
+    <img src="/{{ lesson.image }}" alt="{{ lesson.lesson_desc }}">
+    {% else %}
+    <img src="{{ lesson.image }}" alt="{{ lesson.lesson_desc }}">
+    {% endif %}
 {% endif %}

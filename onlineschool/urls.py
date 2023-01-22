@@ -17,20 +17,29 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from django.contrib.auth.models import User
 from lessons.models import Lesson
-from rest_framework import routers, serializers, viewsets, filters
+from rest_framework import routers, serializers, viewsets, filters, status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.utils import translation
+from rest_framework.validators import UniqueValidator
+import json
 
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'email', 'is_staff']
+        fields = ['id', 'username', 'email', 'is_staff']
 class LessonSerializer(serializers.HyperlinkedModelSerializer):
+    lesson_name = serializers.CharField(label='Название урока', max_length=50, validators=[UniqueValidator(queryset=Lesson.objects.all(), message="Lesson name must be unique")])
+    image = serializers.URLField(label='Изображение')
     class Meta:
         model = Lesson
-        fields = ['lesson_name', 'lesson_desc', 'author', 'pub_date', 'image']
+        fields = ['id', 'lesson_name', 'lesson_desc', 'author', 'pub_date', 'image']
+    def validate_author(self, author):
+        if not author.is_staff:
+            raise serializers.ValidationError("Only staff members can author lessons.")
+        return author
 
 # ViewSets define the view behavior.
 class UserViewSet(viewsets.ModelViewSet):
@@ -43,6 +52,11 @@ class LessonViewSet(viewsets.ModelViewSet):
     search_fields = ['lesson_name', 'lesson_desc']
     ordering_fields = ['lesson_name', 'pub_date']
     
+    def initial(self, request, *args, **kwargs):
+        language = kwargs.get('lang')
+        translation.activate(language)
+        super(LessonViewSet, self).initial(request, *args, **kwargs)    
+    
     def get_queryset(self):
         queryset = Lesson.objects.all()
         username = self.request.query_params.get('username')
@@ -50,18 +64,28 @@ class LessonViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(author__username=username)
         return queryset
     
-    @action(methods=['GET'], detail=False)
+    @action(methods=['GET'], detail=False, name='Получить статистику уроков')
     def get_lesson_stats(self, request, **kwargs):
         lessons = Lesson.objects.all()
         data = dict()
         data['lessons_count'] = lessons.count()
         data['new_lessons'] = len([l for l in lessons if l.was_published_recently()])
         for u in User.objects.all():
-            data['lessons_by_' + u.username] = 0
-            for l in lessons:
-                if l.author == u:
-                    data['lessons_by_' + u.username] += 1
-        return Response(data)    
+            if u.is_staff:
+                data['lessons_by_' + u.username] = 0
+                for l in lessons:
+                    if l.author == u:
+                        data['lessons_by_' + u.username] += 1
+        return Response(data)
+    
+    @action(methods=['POST'], detail=True, name='Добавить внешнее изображение')
+    def add_external_image(self, request, **kwargs):
+        lesson = self.get_object()
+        externalimage = request.data['image']
+        if externalimage:
+            lesson.image = externalimage
+            lesson.save()
+        return Response()
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
