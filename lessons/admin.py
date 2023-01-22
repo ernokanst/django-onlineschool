@@ -1,6 +1,8 @@
 from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
 from modeltranslation.admin import TranslationAdmin
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin
 from .models import Lesson
 
 
@@ -18,4 +20,11 @@ class LessonAdmin(SimpleHistoryAdmin):
 class TranslatedLessonAdmin(LessonAdmin, TranslationAdmin):
     pass
 
-admin.site.register(Lesson, TranslatedLessonAdmin)
+class LessonResource(resources.ModelResource):
+    class Meta:
+        model = Lesson
+
+class LessonExportAdmin(TranslatedLessonAdmin, ImportExportModelAdmin):
+    resource_classes = [LessonResource]
+
+admin.site.register(Lesson, LessonExportAdmin)
