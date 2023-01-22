@@ -21,9 +21,9 @@ from rest_framework import routers, serializers, viewsets, filters, status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.utils import translation
+from django.utils import translation, timezone
 from rest_framework.validators import UniqueValidator
-import json
+from django.db.models import Q
 
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -58,7 +58,7 @@ class LessonViewSet(viewsets.ModelViewSet):
         super(LessonViewSet, self).initial(request, *args, **kwargs)    
     
     def get_queryset(self):
-        queryset = Lesson.objects.all()
+        queryset = Lesson.objects.filter(Q(pub_date__lte=timezone.now()))
         username = self.request.query_params.get('username')
         if username is not None:
             queryset = queryset.filter(author__username=username)
