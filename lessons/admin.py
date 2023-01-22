@@ -1,5 +1,6 @@
 from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
+from modeltranslation.admin import TranslationAdmin
 from .models import Lesson
 
 
@@ -12,6 +13,9 @@ class LessonAdmin(SimpleHistoryAdmin):
         if obj.prev_record:
             delta = obj.diff_against(obj.prev_record)
             return delta.changed_fields
-        return None    
+        return None
 
-admin.site.register(Lesson, LessonAdmin)
+class TranslatedLessonAdmin(LessonAdmin, TranslationAdmin):
+    pass
+
+admin.site.register(Lesson, TranslatedLessonAdmin)

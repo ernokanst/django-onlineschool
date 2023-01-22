@@ -31,6 +31,10 @@ ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '[::1]']
 # Application definition
 
 INSTALLED_APPS = [
+    'modeltranslation',
+    'rest_framework',
+    'django_filters',
+    'simple_history',    
     'lessons.apps.LessonsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -38,9 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'django_filters',
-    'simple_history',
 ]
 
 MIDDLEWARE = [
@@ -116,6 +117,13 @@ USE_I18N = True
 
 USE_TZ = True
 
+gettext = lambda s: s
+LANGUAGES = (
+    ('ru', gettext('Русский')),
+    ('en', gettext('English')),
+)
+
+MODELTRANSLATION_PREPOPULATE_LANGUAGE = 'ru'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/

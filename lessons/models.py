@@ -2,7 +2,6 @@ from django.db import models
 import datetime
 from django.utils import timezone
 from django.contrib.auth.models import User
-from simple_history.models import HistoricalRecords
 
 class Lesson(models.Model):
     lesson_name = models.CharField('Название урока', max_length=50)
@@ -10,7 +9,6 @@ class Lesson(models.Model):
     author = models.ForeignKey(User, verbose_name=u'Автор', null=True, on_delete=models.SET_NULL)
     pub_date = models.DateTimeField('Дата публикации', default=timezone.now)
     image = models.ImageField('Изображение', upload_to='static/lessons/', blank=True)
-    history = HistoricalRecords()
     
     def __str__(self):
         return self.lesson_name
